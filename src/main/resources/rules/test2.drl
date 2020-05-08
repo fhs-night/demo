@@ -1,0 +1,16 @@
+package rules;
+dialect  "mvel"
+
+import java.util.Map;
+
+rule "test2"
+    when
+        $a : Map($archetype_deatils : ["archetype_deatils"] != null)
+        eval($a.entrySet())
+        Map($archetype_id : ["archetype_id"]) from $archetype_deatils;
+        //Map(["value"] == "openEHR-EHR-OBSERVATION.respiration.v1.0.0") from $archetype_id;
+
+    then
+        System.out.println("success");
+
+end

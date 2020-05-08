@@ -1,0 +1,37 @@
+package rules;
+dialect  "mvel"
+import com.nedap.archie.rm.composition.CareEntry;
+import com.nedap.archie.rm.composition.Entry;
+import com.nedap.archie.rm.composition.ContentItem;
+import com.nedap.archie.rm.archetyped.Locatable;
+import com.nedap.archie.rm.archetyped.Pathable;
+import com.nedap.archie.rm.composition.Observation;
+import com.nedap.archie.rm.archetyped.Archetyped;
+import com.nedap.archie.rm.support.identification.ArchetypeID;
+import com.nedap.archie.rm.datastructures.History;
+import com.nedap.archie.rm.datastructures.ItemStructure;
+import com.nedap.archie.rm.datastructures.Event;
+import com.nedap.archie.rm.datastructures.ItemTree;
+import com.nedap.archie.rm.datastructures.Element
+import com.nedap.archie.rm.datavalues.quantity.DvQuantity;
+
+
+
+rule "test"
+    lock-on-active true
+    when
+        $Observation : Observation( $archetypeDetails : archetypeDetails, $history_data : data, archetypeNodeId == "id1" );
+        Archetyped( $archetypeId : archetypeId ) from $archetypeDetails;
+        ArchetypeID( domainConcept == "respiration", versionId == "1.0.0" ) from $archetypeId;
+        History( $eventsList : events, archetypeNodeId == "id2" ) from $history_data;
+        Event( $ItemList_data : data, archetypeNodeId == "id3" ) from $eventsList;
+        ItemTree( $items : items, archetypeNodeId == "id4" ) from $ItemList_data;
+        $e : Element( $Rate : value, archetypeNodeId == "id5") from $items
+        DvQuantity(magnitude > 10) from $Rate;
+    then
+        System.out.println("success");
+        double a = ((DvQuantity) $Rate).getMagnitude();
+        System.out.println("the magnitude of value is: ");
+        System.out.println(a);
+
+end
